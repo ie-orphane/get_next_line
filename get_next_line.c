@@ -6,7 +6,7 @@
 /*   By: ielyatim <ielyatim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:21:33 by ielyatim          #+#    #+#             */
-/*   Updated: 2024/11/16 11:23:32 by ielyatim         ###   ########.fr       */
+/*   Updated: 2024/11/16 11:38:05 by ielyatim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,16 @@ static char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (str);
 }
 
+static char	*get_new_line(char **stash, char *buffer, ssize_t nb)
+{
+	char	*line;
+
+	line = ft_substr(*stash, 0, ft_strlen(*stash) - nb + 1);
+	free(*stash);
+	*stash = ft_substr(buffer, 5 - nb + 1, nb - 1);
+	return (line);
+}
+
 char	*get_next_line(int fd)
 {
 	char		buffer[5];
@@ -57,11 +67,7 @@ char	*get_next_line(int fd)
 		while (--nb && !line)
 		{
 			if (buffer[5 - nb] == '\n')
-			{
-				line = ft_substr(stash, 0, ft_strlen(stash) - nb + 1);
-				free(stash);
-				stash = ft_substr(buffer, 5 - nb + 1, nb - 1);
-			}
+				line = get_new_line(&stash, buffer, nb);
 		}
 	}
 	return (line);
