@@ -6,7 +6,7 @@
 /*   By: ielyatim <ielyatim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:21:33 by ielyatim          #+#    #+#             */
-/*   Updated: 2024/11/17 17:05:05 by ielyatim         ###   ########.fr       */
+/*   Updated: 2024/11/17 17:14:30 by ielyatim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,13 @@ char	*get_next_line(int fd)
 	static char	*stash;
 	char		*line;
 	char		*tmp;
-	char		buffer[BUFFER_SIZE + 1];
+	char		*buffer;
 	ssize_t		bytes_read;
 
+	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buffer)
+		return (NULL);
+	line = NULL;
 	while (1)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
@@ -85,14 +89,14 @@ char	*get_next_line(int fd)
 	if (stash && *stash)
 	{
 		if (ft_strchr(stash, '\n'))
+			line = get_new_line(&stash);
+		else
 		{
-			tmp = get_new_line(&stash);
-			return (tmp);
+			line = ft_strdup(stash);
+			free(stash);
+			stash = NULL;
 		}
-		line = ft_strdup(stash);
-		free(stash);
-		stash = NULL;
-		return (line);
 	}
-	return (NULL);
+	free(buffer);
+	return (line);
 }
