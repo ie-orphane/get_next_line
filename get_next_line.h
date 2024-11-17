@@ -6,7 +6,7 @@
 /*   By: ielyatim <ielyatim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:21:35 by ielyatim          #+#    #+#             */
-/*   Updated: 2024/11/17 08:51:16 by ielyatim         ###   ########.fr       */
+/*   Updated: 2024/11/17 11:03:48 by ielyatim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 #  define BUFFER_SIZE 5
 # endif  // BUFFER_SIZE
 
-char	*ft_strchr(const char *s, int c);
+// char	*ft_strchr(const char *s, int c);
 size_t	ft_strlen(const char *s);
 char	*ft_strdup(const char *s1);
 char	*ft_strjoin(char const *s1, char const *s2);

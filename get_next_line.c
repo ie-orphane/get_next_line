@@ -6,7 +6,7 @@
 /*   By: ielyatim <ielyatim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:21:33 by ielyatim          #+#    #+#             */
-/*   Updated: 2024/11/17 10:48:51 by ielyatim         ###   ########.fr       */
+/*   Updated: 2024/11/17 17:05:05 by ielyatim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ static char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (str);
 }
 
-char	*ft_strchr(const char *s, int c)
+static char	*ft_strchr(const char *s, int c)
 {
 	while (*s != 0)
 	{
@@ -50,87 +50,49 @@ char	*ft_strchr(const char *s, int c)
 	return (0);
 }
 
-static int	ft_strindex(const char *s, int c)
-{
-	int	i;
-
-	if (s)
-	{
-		i = 0;
-		while (s[i])
-		{
-			if (s[i] == c)
-				return (i);
-			i++;
-		}
-		if (s[i] == c && c == '\0')
-			return (i);
-	}
-	return (-1);
-}
-
 static char	*get_new_line(char **stash)
 {
 	char	*line;
+	size_t	newline_index;
 	char	*tmp;
-	int		index;
-	
-	index = ft_strindex(*stash, '\n');
-	line = NULL;
-	if (index != -1)
-	{
-		line = ft_substr(*stash, 0, index + 1);
-		tmp = ft_substr(*stash, index + 1, ft_strlen(*stash));
-		free(*stash);
-		*stash = tmp;
-	}
+
+	newline_index = ft_strchr(*stash, '\n') - *stash;
+	line = ft_substr(*stash, 0, newline_index + 1);
+	tmp = ft_strdup(*stash + newline_index + 1);
+	free(*stash);
+	*stash = tmp;
 	return (line);
-}
-
-static void	fill_stash(char **stash, const char *buffer, ssize_t nb)
-{
-	char	*tmp;
-
-	if (*stash)
-	{
-		tmp = ft_substr(buffer, 0, nb);
-		*stash = ft_strjoin(*stash, tmp);
-		free(tmp);
-	}
-	else
-		*stash = ft_strdup(buffer);
 }
 
 char	*get_next_line(int fd)
 {
-	char		*buffer;
 	static char	*stash;
 	char		*line;
-	ssize_t		nb;
+	char		*tmp;
+	char		buffer[BUFFER_SIZE + 1];
+	ssize_t		bytes_read;
 
-	line = NULL;
-	buffer = malloc(BUFFER_SIZE * sizeof(char));
-	while (!line)
+	while (1)
 	{
-		nb = read(fd, buffer, BUFFER_SIZE);
-		if (nb < 0)
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (bytes_read <= 0)
 			break ;
-		if (nb == 0 && !stash)
-			break ;
-		if (nb == 0 && stash)
-		{
-			line = get_new_line(&stash);
-			if (!line)
-			{
-				line = ft_substr(stash, 0, ft_strlen(stash));
-				free(stash);
-				stash = NULL;
-			}
-			break ;
-		}
-		fill_stash(&stash, buffer, nb);
-		line = get_new_line(&stash);
+		buffer[bytes_read] = '\0';
+		tmp = ft_strjoin(stash, buffer);
+		free(stash);
+		stash = tmp;
 	}
-	free(buffer);
-	return (line);
+	if (stash && *stash)
+	{
+		if (ft_strchr(stash, '\n'))
+		{
+			tmp = get_new_line(&stash);
+			return (tmp);
+		}
+		line = ft_strdup(stash);
+		free(stash);
+		stash = NULL;
+		return (line);
+	}
+	return (NULL);
 }
