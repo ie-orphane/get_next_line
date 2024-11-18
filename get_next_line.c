@@ -6,7 +6,7 @@
 /*   By: ielyatim <ielyatim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:21:33 by ielyatim          #+#    #+#             */
-/*   Updated: 2024/11/18 09:51:12 by ielyatim         ###   ########.fr       */
+/*   Updated: 2024/11/18 17:11:16 by ielyatim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,13 @@ static char	*ft_strchr(const char *s, int c)
 	return (0);
 }
 
+static void	*ft_free(char **buffer, char *tmp)
+{
+	free(*buffer);
+	*buffer = tmp;
+	return (NULL);
+}
+
 static char	*get_new_line(char **stash)
 {
 	char	*line;
@@ -64,21 +71,17 @@ static char	*get_new_line(char **stash)
 		{
 			newline_index = ft_strchr(*stash, '\n') - *stash;
 			line = ft_substr(*stash, 0, newline_index + 1);
+			if (!line)
+				return (NULL);
 			tmp = ft_strdup(*stash + newline_index + 1);
+			if (!tmp)
+				return (ft_free(&line, NULL));
 		}
 		else
 			line = ft_strdup(*stash);
 	}
-	free(*stash);
-	*stash = tmp;
+	ft_free(stash, tmp);
 	return (line);
-}
-
-static void	*ft_free(char **buffer)
-{
-	free(*buffer);
-	*buffer = NULL;
-	return (NULL);
 }
 
 char	*get_next_line(int fd)
@@ -89,7 +92,7 @@ char	*get_next_line(int fd)
 	ssize_t		bytes_read;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0))
-		return (ft_free(&stash));
+		return (ft_free(&stash, NULL));
 	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buffer)
 		return (NULL);
@@ -100,9 +103,10 @@ char	*get_next_line(int fd)
 			break ;
 		buffer[bytes_read] = '\0';
 		tmp = ft_strjoin(stash, buffer);
-		free(stash);
-		stash = tmp;
+		ft_free(&stash, tmp);
+		if (ft_strchr(stash, '\n'))
+			break ;
 	}
-	ft_free(&buffer);
+	ft_free(&buffer, NULL);
 	return (get_new_line(&stash));
 }
