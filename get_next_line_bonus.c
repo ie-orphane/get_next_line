@@ -6,7 +6,7 @@
 /*   By: ielyatim <ielyatim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:21:33 by ielyatim          #+#    #+#             */
-/*   Updated: 2024/11/18 17:28:12 by ielyatim         ###   ########.fr       */
+/*   Updated: 2024/12/02 15:33:38 by ielyatim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,11 +71,8 @@ static char	*get_new_line(char **stash)
 		{
 			newline_index = ft_strchr(*stash, '\n') - *stash;
 			line = ft_substr(*stash, 0, newline_index + 1);
-			if (!line)
-				return (NULL);
-			tmp = ft_strdup(*stash + newline_index + 1);
-			if (!tmp)
-				return (ft_free(&line, NULL));
+			if (line)
+				tmp = ft_strdup(*stash + newline_index + 1);
 		}
 		else
 			line = ft_strdup(*stash);
@@ -91,11 +88,13 @@ char	*get_next_line(int fd)
 	char		*buffer;
 	ssize_t		bytes_read;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0))
-		return (ft_free(&stash[fd], NULL));
-	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (!buffer)
+	if (fd < 0 || fd >= 1024 || BUFFER_SIZE <= 0)
 		return (NULL);
+	if (read(fd, 0, 0))
+		return (ft_free(&stash[fd], NULL));
+	buffer = malloc(((size_t)BUFFER_SIZE + 1) * sizeof(char));
+	if (!buffer)
+		return (ft_free(&stash[fd], NULL));
 	while (1)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
